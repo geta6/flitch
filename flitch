@@ -4,7 +4,7 @@ fs = require 'fs'
 as = require 'async'
 cv = require 'opencv'
 im = require 'imagemagick'
-
+ex = (require 'child_process').exec
 
 src = process.argv[2]
 dst = "#{src}.new.png"
@@ -16,6 +16,9 @@ unless src?
 
 fs.writeFileSync dst, fs.readFileSync src
 
+debug = process.argv.indexOf('-d') isnt -1
+
+console.log 'debug' if debug
 
 tmps = []
 
@@ -41,6 +44,7 @@ cv.readImage src, (e, img) ->
       im.composite ['-geometry', "+#{f.x}+#{f.y}", tmp, dst, dst], (e) ->
         next()
     , ->
-      console.log 'end'
-      img.save './out.jpg'
+      ex "open #{dst}"
+      if debug
+        img.save './debug.detection.jpg'
       rmtmp()
