@@ -4,6 +4,7 @@
 
 ## Requirement
 
+* coffeescript
 * opencv
 * imagemagick
 
