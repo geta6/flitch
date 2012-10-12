@@ -1,0 +1,26 @@
+{
+  "name": "flitch",
+  "description": "Glith + FaceDetect",
+  "main": "./flitch",
+  "author": {
+    "name": "geta6"
+  },
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/geta6/flitch.git"
+  },
+  "bugs": {
+    "url": "http://github.com/geta6/flitch/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT"
+    }
+  ],
+  "dependencies": {
+    "async": "*",
+    "opencv": "*",
+    "imagemagick": "git://github.com/TheHippo/node-imagemagick.git"
+  }
+}

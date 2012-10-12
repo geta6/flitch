@@ -1,0 +1,46 @@
+#!/usr/bin/env coffee
+
+fs = require 'fs'
+as = require 'async'
+cv = require 'opencv'
+im = require 'imagemagick'
+
+
+src = process.argv[2]
+dst = "#{src}.new.png"
+
+unless src?
+  console.log 'No file specified'
+  console.log 'Usage: ./flitch [filename]'
+  process.exit(1)
+
+fs.writeFileSync dst, fs.readFileSync src
+
+
+tmps = []
+
+mktmp = ->
+  name = "/tmp/#{Date.now()}.png"
+  tmps.push name
+  return name
+
+rmtmp = ->
+  for tmp in tmps
+    fs.unlink tmp, (e) ->
+      console.error "error on unlink #{tmp}" if e
+
+cv.readImage src, (e, img) ->
+  img.detectObject './node_modules/opencv/data/haarcascade_frontalface_alt2.xml', {}, (e, faces) ->
+    as.forEachSeries faces, (f, next) ->
+      mat = new cv.Matrix img, f.x, f.y, f.width, f.height
+      buf = mat.toBuffer().toString 'base64'
+      buf = new Buffer buf.replace(/1/g, 'B'), 'base64'
+      tmp = mktmp()
+      img.ellipse(f.x + f.width/2, f.y + f.height/2, f.width/2, f.height/2);
+      fs.writeFileSync tmp, buf
+      im.composite ['-geometry', "+#{f.x}+#{f.y}", tmp, dst, dst], (e) ->
+        next()
+    , ->
+      console.log 'end'
+      img.save './out.jpg'
+      rmtmp()
